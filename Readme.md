@@ -2,7 +2,7 @@
 ```bash
 $ uvicorn main:app --reload
 
-#특정 포트 지정 실행
+# 포트 지정 실행
 $ uvicorn main:app --reload --port 8001   
 ```
 
@@ -33,6 +33,6 @@ main:app --reload
 ### - ReDic
 * http://127.0.0.1:8000/redoc
 
-# port 사용중 확인
+# port 사용중인 process 확인 
 - Mac/Linux ```lsof -i :8000```
 - Windows  ```netstat -ano | findstr :8000```

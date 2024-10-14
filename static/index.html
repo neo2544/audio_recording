@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>음성 녹음 테스트</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { color: #333; }
+        label { display: block; margin-top: 20px; }
+        select, button { margin-top: 10px; padding: 10px; font-size: 16px; }
+        #message { margin-top: 20px; color: red; }
+        audio { margin-top: 20px; display: block; }
+        #recordingsList {
+            max-height: 400px; /* 원하는 높이로 설정 */
+            overflow-y: auto;  /* 세로 스크롤바 표시 */
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            word-break: break-all; /* 긴 텍스트가 있을 경우 줄 바꿈 */
+        }
+        th {
+            background-color: #f4f4f4;
+            position: sticky; /* 헤더를 고정 */
+            top: 0;
+            z-index: 1;
+        }
+        .playButton, .deleteButton {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>음성 녹음 테스트 페이지</h1>
+    <label for="inputDeviceSelect">입력 장치 선택:</label>
+    <select id="inputDeviceSelect">
+        <option value="">입력 장치 목록을 불러오는 중...</option>
+    </select>
+    <button id="refreshDevicesButton">장치 목록 새로고침</button>
+    <button id="startButton">녹음 시작</button>
+    <button id="stopButton" disabled>녹음 종료</button>
+    <div id="message"></div>
+    <audio id="audioPlayer" controls style="display:none;"></audio>
+
+    <h2>녹음된 파일 목록</h2>
+    <div id="recordingsList"></div>
+
+    <label for="outputDeviceSelect">출력 장치 선택:</label>
+    <select id="outputDeviceSelect">
+        <option value="">출력 장치 목록을 불러오는 중...</option>
+    </select>
+    <button id="playServerButton" disabled>서버에서 재생</button>
+    <button id="stopServerButton" disabled>서버 재생 중지</button>
+
+    <script>
+        const inputDeviceSelect = document.getElementById('inputDeviceSelect');
+        const outputDeviceSelect = document.getElementById('outputDeviceSelect');
+        const refreshDevicesButton = document.getElementById('refreshDevicesButton');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const playServerButton = document.getElementById('playServerButton');
+        const stopServerButton = document.getElementById('stopServerButton');
+        const messageDiv = document.getElementById('message');
+        const recordingsList = document.getElementById('recordingsList');
+        const audioPlayer = document.getElementById('audioPlayer');
+
+        let selectedRecording = null;
+
+        // 오디오 장치 목록 불러오기 함수
+        function loadAudioDevices() {
+            fetch('/audio_devices')
+                .then(response => response.json())
+                .then(data => {
+                    // 입력 장치 목록 업데이트
+                    inputDeviceSelect.innerHTML = '';
+                    data.input_devices.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.index;
+                        option.textContent = `(${device.index}) ${device.name}`;
+                        inputDeviceSelect.appendChild(option);
+                    });
+
+                    // 출력 장치 목록 업데이트
+                    outputDeviceSelect.innerHTML = '';
+                    data.output_devices.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.index;
+                        option.textContent = `(${device.index}) ${device.name}`;
+                        outputDeviceSelect.appendChild(option);
+                    });
+
+                    messageDiv.textContent = '오디오 장치 목록이 업데이트되었습니다.';
+                    messageDiv.style.color = 'green';
+                })
+                .catch(error => {
+                    console.error('오디오 장치 목록을 불러오는 중 오류 발생:', error);
+                    messageDiv.textContent = '오디오 장치 목록을 불러오는데 실패했습니다.';
+                    messageDiv.style.color = 'red';
+                });
+        }
+
+        // 녹음된 파일 목록 불러오기 함수
+        function loadRecordings() {
+            fetch('/recordings')
+                .then(response => response.json())
+                .then(data => {
+                    // 테이블 헤더 생성
+                    const tableHeader = `
+                        <tr>
+                            <th>디바이스 이름</th>
+                            <th>녹음 시간</th>
+                            <th>파일명</th>
+                            <th>재생</th>
+                            <th>삭제</th>
+                        </tr>`;
+
+                    let tableRows = '';
+                    data.recordings.forEach(filename => {
+                        // 파일명에서 디바이스 이름과 타임스탬프를 분리
+                        const parts = filename.split('_');
+                        const deviceName = parts.slice(0, -2).join('_');  // 디바이스 이름
+                        const timestamp = parts.slice(-2).join('_').replace('.wav', '');
+
+                        // 테이블 행 생성
+                        tableRows += `
+                            <tr>
+                                <td>${deviceName}</td>
+                                <td>${timestamp}</td>
+                                <td>${filename}</td>
+                                <td><button class="playButton" data-filename="${filename}">재생</button></td>
+                                <td><button class="deleteButton" data-filename="${filename}">삭제</button></td>
+                            </tr>`;
+                    });
+
+                    // 테이블 전체 생성
+                    recordingsList.innerHTML = `<table>${tableHeader}${tableRows}</table>`;
+
+                    // 재생 및 삭제 버튼에 이벤트 리스너 추가
+                    const playButtons = document.querySelectorAll('.playButton');
+                    playButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            const filename = button.getAttribute('data-filename');
+                            selectRecording(filename);
+                            playRecording(filename);
+                        });
+                    });
+
+                    const deleteButtons = document.querySelectorAll('.deleteButton');
+                    deleteButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            const filename = button.getAttribute('data-filename');
+                            deleteRecording(filename);
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('녹음된 파일 목록을 불러오는 중 오류 발생:', error);
+                });
+        }
+
+        // 녹음된 파일 선택 함수
+        function selectRecording(filename) {
+            selectedRecording = filename;
+            playServerButton.disabled = false;
+            stopServerButton.disabled = false;  // 재생 중지 버튼 활성화
+            messageDiv.textContent = `${filename} 파일이 선택되었습니다.`;
+            messageDiv.style.color = 'blue';
+        }
+
+        // 클라이언트 측 오디오 재생 함수
+        function playRecording(filename) {
+            const fileUrl = `/recordings/${filename}`;
+            audioPlayer.src = fileUrl;
+            audioPlayer.style.display = 'block';
+            audioPlayer.play();
+            messageDiv.textContent = `${filename} 재생 중...`;
+            messageDiv.style.color = 'blue';
+        }
+
+        // 서버에서 오디오 재생 함수
+        function playAudioOnServer() {
+            if (!selectedRecording) {
+                alert('재생할 녹음 파일을 선택해주세요.');
+                return;
+            }
+
+            const outputDeviceIndex = outputDeviceSelect.value;
+            if (!outputDeviceIndex) {
+                alert('출력 장치를 선택해주세요.');
+                return;
+            }
+
+            fetch(`/play_audio?filename=${encodeURIComponent(selectedRecording)}&device_index=${outputDeviceIndex}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.detail) {
+                    throw data.detail;
+                }
+                messageDiv.textContent = data.message;
+                messageDiv.style.color = 'green';
+            })
+            .catch(error => {
+                console.error('오디오 재생 중 오류 발생:', error);
+                messageDiv.textContent = '오디오 재생에 실패했습니다: ' + error;
+                messageDiv.style.color = 'red';
+            });
+        }
+
+        // 서버에서 오디오 재생 중지 함수
+        function stopAudioOnServer() {
+            fetch('/stop_audio', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.detail) {
+                    throw data.detail;
+                }
+                messageDiv.textContent = data.message;
+                messageDiv.style.color = 'green';
+            })
+            .catch(error => {
+                console.error('오디오 재생 중지 중 오류 발생:', error);
+                messageDiv.textContent = '오디오 재생 중지에 실패했습니다: ' + error;
+                messageDiv.style.color = 'red';
+            });
+        }
+
+        // 파일 삭제 함수 추가
+        function deleteRecording(filename) {
+            if (!confirm(`${filename} 파일을 삭제하시겠습니까?`)) {
+                return;
+            }
+
+            fetch(`/delete_recording?filename=${encodeURIComponent(filename)}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.detail) {
+                    throw data.detail;
+                }
+                messageDiv.textContent = data.message;
+                messageDiv.style.color = 'green';
+                // 파일 목록 갱신
+                loadRecordings();
+            })
+            .catch(error => {
+                console.error('파일 삭제 중 오류 발생:', error);
+                messageDiv.textContent = '파일 삭제에 실패했습니다: ' + error;
+                messageDiv.style.color = 'red';
+            });
+        }
+
+        // 오디오 장치 목록 새로고침 버튼 클릭 이벤트
+        refreshDevicesButton.addEventListener('click', () => {
+            loadAudioDevices();
+        });
+
+        startButton.addEventListener('click', () => {
+            const deviceIndex = inputDeviceSelect.value;
+            if (!deviceIndex) {
+                alert('입력 장치를 선택해주세요.');
+                return;
+            }
+            fetch(`/start_recording?device_index=${deviceIndex}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.detail) {
+                    throw data.detail;
+                }
+                messageDiv.textContent = data.message;
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                messageDiv.style.color = 'green';
+            })
+            .catch(error => {
+                console.error('녹음 시작 중 오류 발생:', error);
+                messageDiv.textContent = '녹음 시작에 실패했습니다: ' + error;
+                messageDiv.style.color = 'red';
+            });
+        });
+
+        stopButton.addEventListener('click', () => {
+            fetch('/stop_recording', {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    return response.json().then(err => { throw err.detail; });
+                }
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                audioPlayer.src = url;
+                audioPlayer.style.display = 'block';
+                audioPlayer.play();
+                messageDiv.textContent = '녹음이 완료되었습니다.';
+                messageDiv.style.color = 'green';
+                startButton.disabled = false;
+                stopButton.disabled = true;
+
+                // 녹음된 파일 목록 갱신
+                loadRecordings();
+            })
+            .catch(error => {
+                console.error('녹음 종료 중 오류 발생:', error);
+                messageDiv.textContent = '녹음 종료에 실패했습니다: ' + error;
+                messageDiv.style.color = 'red';
+            });
+        });
+
+        playServerButton.addEventListener('click', playAudioOnServer);
+        stopServerButton.addEventListener('click', stopAudioOnServer);
+
+        // 페이지 로드 시 오디오 장치 및 녹음된 파일 목록 불러오기
+        window.onload = () => {
+            loadAudioDevices();
+            loadRecordings();
+        };
+    </script>
+</body>
+</html>

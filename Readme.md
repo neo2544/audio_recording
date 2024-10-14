@@ -1,6 +1,9 @@
 # Run
 ```bash
 $ uvicorn main:app --reload
+
+#특정 포트 지정 실행
+$ uvicorn main:app --reload --port 8001   
 ```
 
 ## FastAPI 디버그 구성 만들기(PyCharm)
@@ -29,3 +32,7 @@ main:app --reload
 
 ### - ReDic
 * http://127.0.0.1:8000/redoc
+
+# port 사용중 확인
+- Mac/Linux ```lsof -i :8000```
+- Windows  ```netstat -ano | findstr :8000```

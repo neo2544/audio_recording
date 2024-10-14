@@ -1,6 +1,7 @@
 # Default ignored files
 /shelf/
 /workspace.xml
-/.venv
-/recordings
-/.idea
+/.venv/
+/recordings/
+/.idea/
+/misc.xml

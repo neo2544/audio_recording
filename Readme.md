@@ -18,7 +18,7 @@ $ uvicorn main:app --reload --port 8001
 # 환경 구성 (WatchMAN+ 연동)
 ![image](https://github.com/user-attachments/assets/e3d7951a-f060-42a6-9a56-963b9123ec2a)
 - (참고)USB C to AUX 젠더 : https://search.shopping.naver.com/catalog/40569751618?adId=nad-a001-02-000000248726605&channel=nshop.npla&query=usbCtoaux&NaPm=ct%3Dm29ryveg%7Cci%3D0zW0002VLKPBKsZ8Hfib%7Ctr%3Dpla%7Chk%3Dd6a8f05e6f257c7193a79876f2b883fd10d53985%7Cnacn%3D7RcxBUwRwSGM&cid=0zW0002VLKPBKsZ8Hfib
-- (참고)AUX 케이블 4극 : https://smartstore.naver.com/machsys/products/5060409987?n_media=11068&n_query=AUX4%EA%B7%B9&n_rank=1&n_ad_group=grp-a001-02-000000037996760&n_ad=nad-a001-02-000000268959871&n_campaign_type=2&n_mall_id=mach611&n_mall_pid=5060409987&n_ad_group_type=2&n_match=3&NaPm=ct%3Dm2a46aug%7Cci%3D0Hb%2D003f5KTBjFsyhLiF%7Ctr%3Dpla%7Chk%3D12648b7f2721357ddcb4baafac6bed6468ef5be0%7Cnacn%3D7RcxBUwRwSGM
+- (참고)AUX 케이블 4극 : [https://smartstore.naver.com/machsys/products/5060409987?n_media=11068&n_query=AUX4%EA%B7%B9&n_rank=1&n_ad_group=grp-a001-02-000000037996760&n_ad=nad-a001-02-000000268959871&n_campaign_type=2&n_mall_id=mach611&n_mall_pid=5060409987&n_ad_group_type=2&n_match=3&NaPm=ct%3Dm2a46aug%7Cci%3D0Hb%2D003f5KTBjFsyhLiF%7Ctr%3Dpla%7Chk%3D12648b7f2721357ddcb4baafac6bed6468ef5be0%7Cnacn%3D7RcxBUwRwSGM](https://search.shopping.naver.com/catalog/18713142965?query=aux%20%EC%BC%80%EC%9D%B4%EB%B8%94%204%EA%B7%B9&NaPm=ct%3Dm2a49d6o%7Cci%3D28e8ecfa7d3cfa5d122485c2329747e3b68a0f10%7Ctr%3Dslsl%7Csn%3D95694%7Chk%3D7a9e538cebac95936d99c2410383c4f1ae90318d)
 # port 사용중인 process 확인 
 - Mac/Linux ```lsof -i :8000```
 - Windows  ```netstat -ano | findstr :8000```

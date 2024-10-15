@@ -5,6 +5,7 @@ $ uvicorn main:app --reload
 # 포트 지정 실행
 $ uvicorn main:app --reload --port 8001   
 ```
+* http://127.0.0.1:8000
   ![image](https://github.com/user-attachments/assets/01a7dde4-28ea-4d24-906d-92815c7efbc5)
 
 # API 문서

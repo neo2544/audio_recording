@@ -10,7 +10,6 @@ $ uvicorn main:app --reload --port 8001
 # API 문서
 ### - ReDic
 * http://127.0.0.1:8000/redoc
-* 
 ### - Swagger
 * http://127.0.0.1:8000/docs
 ![image](https://github.com/user-attachments/assets/bdcc14fc-3de3-40d9-ae92-a31857bc30b0)

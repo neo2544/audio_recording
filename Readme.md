@@ -7,7 +7,20 @@ $ uvicorn main:app --reload --port 8001
 ```
   ![image](https://github.com/user-attachments/assets/01a7dde4-28ea-4d24-906d-92815c7efbc5)
 
-  
+# API 문서
+### - ReDic
+* http://127.0.0.1:8000/redoc
+* 
+### - Swagger
+* http://127.0.0.1:8000/docs
+![image](https://github.com/user-attachments/assets/bdcc14fc-3de3-40d9-ae92-a31857bc30b0)
+ 
+
+# port 사용중인 process 확인 
+- Mac/Linux ```lsof -i :8000```
+- Windows  ```netstat -ano | findstr :8000```
+
+
 ## FastAPI 디버그 구성 만들기(PyCharm)
 1. **PyCharm 실행**: 먼저 PyCharm에서 FastAPI 프로젝트를 엽니다. 
 
@@ -25,19 +38,5 @@ main:app --reload
 여기서 `main:app`은 `main.py` 파일 안의 FastAPI 인스턴스 `app`을 의미합니다. 
 
 * **Python Interpreter**: 현재 프로젝트에서 사용 중인 Python 인터프리터를 선택합니다.”
-
-
-
-# API 문서
-### - Swagger
-* http://127.0.0.1:8000/docs
-
-### - ReDic
-* http://127.0.0.1:8000/redoc
-
-# port 사용중인 process 확인 
-- Mac/Linux ```lsof -i :8000```
-- Windows  ```netstat -ano | findstr :8000```
-
 
 

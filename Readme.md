@@ -5,7 +5,9 @@ $ uvicorn main:app --reload
 # 포트 지정 실행
 $ uvicorn main:app --reload --port 8001   
 ```
+  ![image](https://github.com/user-attachments/assets/01a7dde4-28ea-4d24-906d-92815c7efbc5)
 
+  
 ## FastAPI 디버그 구성 만들기(PyCharm)
 1. **PyCharm 실행**: 먼저 PyCharm에서 FastAPI 프로젝트를 엽니다. 
 
@@ -36,3 +38,6 @@ main:app --reload
 # port 사용중인 process 확인 
 - Mac/Linux ```lsof -i :8000```
 - Windows  ```netstat -ano | findstr :8000```
+
+
+

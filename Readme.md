@@ -17,7 +17,7 @@ $ uvicorn main:app --reload --port 8001
 
 # 환경 구성 (WatchMAN+ 연동)
 ![image](https://github.com/user-attachments/assets/f8d027a7-8106-498b-9514-da9cdb3152fc)
-- usb c to aux 젠더 구매 : https://search.shopping.naver.com/catalog/40569751618?adId=nad-a001-02-000000248726605&channel=nshop.npla&query=usbCtoaux&NaPm=ct%3Dm29ryveg%7Cci%3D0zW0002VLKPBKsZ8Hfib%7Ctr%3Dpla%7Chk%3Dd6a8f05e6f257c7193a79876f2b883fd10d53985%7Cnacn%3D7RcxBUwRwSGM&cid=0zW0002VLKPBKsZ8Hfib
+- (참고)usb c to aux 젠더 : https://search.shopping.naver.com/catalog/40569751618?adId=nad-a001-02-000000248726605&channel=nshop.npla&query=usbCtoaux&NaPm=ct%3Dm29ryveg%7Cci%3D0zW0002VLKPBKsZ8Hfib%7Ctr%3Dpla%7Chk%3Dd6a8f05e6f257c7193a79876f2b883fd10d53985%7Cnacn%3D7RcxBUwRwSGM&cid=0zW0002VLKPBKsZ8Hfib
 
 # port 사용중인 process 확인 
 - Mac/Linux ```lsof -i :8000```
